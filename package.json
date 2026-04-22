@@ -1,0 +1,32 @@
+{
+  "name": "Employee_wala_app",
+  "version": "1.0.0",
+  "dependencies": {
+    "@cap-js/hana": "^2.7.0",
+    "@sap/cds": "^9",
+    "@sap/xssec": "^4.13.0"
+  },
+  "devDependencies": {
+    "@cap-js/sqlite": "^2",
+    "cds-plugin-ui5": "^0.13.0",
+    "eslint": "^10.2.1"
+  },
+  "scripts": {
+    "start": "cds-serve",
+    "watch-empapp": "cds watch --open com.demo.empapp/index.html?sap-ui-xx-viewCache=false --livereload false"
+  },
+  "private": true,
+  "workspaces": [
+    "app/*"
+  ],
+  "sapux": [
+    "app/empapp"
+  ],
+  "cds": {
+    "requires": {
+      "[hybrid]": {
+        "auth": "xsuaa"
+      }
+    }
+  }
+}
