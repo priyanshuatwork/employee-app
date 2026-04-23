@@ -56,9 +56,21 @@ jobs:
       - name: Install Cloud Foundry CLI
         run: |
           curl -L "https://packages.cloudfoundry.org/stable?release=linux64-binary&source=github" -o cf.tgz
+
+          echo "---- Extracting ----"
           tar -xzf cf.tgz
-          chmod +x cf
-          sudo mv cf /usr/local/bin/
+
+          echo "---- Files after extraction ----"
+          ls -la
+
+          # Find cf binary dynamically
+          CF_BINARY=$(find . -type f -name cf | head -n 1)
+
+          echo "Found CF at: $CF_BINARY"
+
+          chmod +x $CF_BINARY
+          sudo mv $CF_BINARY /usr/local/bin/cf
+
           which cf
           cf version
 
