@@ -3,7 +3,7 @@
   "tenant-mode": "dedicated",
   "oauth2-configuration": {
     "redirect-uris": [
-      "https://port5000-workspaces-ws-2u4ga.ap21.trial.applicationstudio.cloud.sap/login/callback"
+      "https://24a2be2trial-dev-employee-crud-app.cfapps.ap21.hana.ondemand.com/login/callback"
     ]
   }
 }

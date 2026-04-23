@@ -1,16 +1,10 @@
 {
-  "welcomeFile": "/index.html",
   "authenticationMethod": "route",
   "routes": [
     {
-      "source": "^/odata/(.*)$",
-      "target": "/odata/$1",
-      "destination": "srv-api",
-      "authenticationType": "xsuaa"
-    },
-    {
       "source": "^/(.*)$",
-      "localDir": "../empapp/webapp",
+      "target": "$1",
+      "destination": "srv-api",
       "authenticationType": "xsuaa"
     }
   ]

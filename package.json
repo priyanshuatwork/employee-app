@@ -1,31 +1,46 @@
 {
-  "name": "Employee_wala_app",
+  "name": "employee-crud-app",
   "version": "1.0.0",
   "dependencies": {
     "@cap-js/hana": "^2.7.0",
+    "@sap-cloud-sdk/connectivity": "^4",
+    "@sap-cloud-sdk/http-client": "^4",
+    "@sap-cloud-sdk/resilience": "^4.6.0",
+    "@sap/approuter": "^21.3.0",
     "@sap/cds": "^9",
     "@sap/xssec": "^4.13.0"
   },
   "devDependencies": {
     "@cap-js/sqlite": "^2",
-    "cds-plugin-ui5": "^0.13.0",
-    "eslint": "^10.2.1"
+    "@sap/cds-dk": "^9",
+    "cds-plugin-ui5": "^0.13.0"
   },
   "scripts": {
     "start": "cds-serve",
-    "watch-empapp": "cds watch --open com.demo.empapp/index.html?sap-ui-xx-viewCache=false --livereload false"
+    "watch-employeecrud": "cds watch --open demo.empcrud.employeecrud/index.html?sap-ui-xx-viewCache=false --livereload false",
+    "watch-customers": "cds watch --open demo.customer.customers/index.html?sap-ui-xx-viewCache=false --livereload false",
+    "watch-customerwala": "cds watch --open com.demo.customerwala/index.html?sap-ui-xx-viewCache=false --livereload false"
   },
   "private": true,
   "workspaces": [
     "app/*"
   ],
   "sapux": [
-    "app/empapp"
+    "app/employeecrud",
+    "app/customers",
+    "app/customerwala"
   ],
   "cds": {
     "requires": {
       "[hybrid]": {
         "auth": "xsuaa"
+      },
+      "northwind": {
+        "kind": "odata",
+        "model": "srv/external/northwind",
+        "credentials": {
+          "url": "https://services.odata.org/v4/northwind/northwind.svc/"
+        }
       }
     }
   }

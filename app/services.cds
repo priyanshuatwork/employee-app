@@ -1,2 +1,1 @@
-
-using from './empapp/annotations';
+using from './customerwala/annotations';

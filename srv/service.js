@@ -2,14 +2,19 @@ const cds = require('@sap/cds');
 
 module.exports = cds.service.impl(async function () {
 
-    const { Employee } = this.entities;   // ✅ FIXED
+  const { Employees } = this.entities;  
+  const northwind = await cds.connect.to('northwind');
 
-    this.before('CREATE', Employee, async (req) => {
+  this.before('CREATE', Employees, async (req) => {
+    const data = req.data;
 
-        const data = req.data;
+    if (!data.empId || !data.empName || !data.email || !data.role || !data.department || data.salary == null) {
+      req.error(400, 'Please provide EMP ID, EMP Name, Email ID, Role, Department, and Salary');
+    }
+  });
 
-        if (!data.empId || !data.empName || !data.email || !data.role || !data.department || data.salary == null) {
-            req.error(400, 'Please provide EMP ID, EMP name, Email ID, Role, Department, and Salary');
-        }
-    });
+  this.on('READ', 'Customers', async (req) => {
+    return northwind.run(req.query);
+  });
+
 });
