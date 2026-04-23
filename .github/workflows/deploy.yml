@@ -20,21 +20,24 @@ jobs:
           node-version: 20
           cache: npm
 
-      - name: Install project dependencies
-        run: npm ci
+      - name: Install dependencies
+        run: npm install
 
-      - name: Install CAP build tools
-        run: npm install -g @sap/cds-dk mbt
+      - name: Install CAP tools
+        run: |
+          npm install -g @sap/cds-dk mbt
 
-      - name: Build CAP project for production
+      - name: Build CAP project
         run: npx cds build --production
 
       - name: Build MTA archive
         run: mbt build
 
-      # ✅ FIXED CF INSTALL
-      - name: Setup Cloud Foundry CLI
-        uses: cloudfoundry/setup-cf-cli@v1
+      - name: Install Cloud Foundry CLI
+        run: |
+          curl -L "https://packages.cloudfoundry.org/stable?release=linux64-binary&source=github" | tar -zx
+          sudo mv cf8 /usr/local/bin/cf 2>/dev/null || sudo mv cf /usr/local/bin/cf
+          cf version
 
       - name: Install MultiApps plugin
         run: |
@@ -48,6 +51,6 @@ jobs:
           cf auth "${{ secrets.CF_USERNAME }}" "${{ secrets.CF_PASSWORD }}"
           cf target -o "${{ secrets.CF_ORG }}" -s "${{ secrets.CF_SPACE }}"
 
-      - name: Deploy MTA to Cloud Foundry
+      - name: Deploy MTA
         run: |
           cf deploy mta_archives/*.mtar -f
