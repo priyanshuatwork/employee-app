@@ -38,7 +38,7 @@ jobs:
           curl -L "https://packages.cloudfoundry.org/stable?release=linux64-binary&source=github" | tar -zx
           sudo mv cf8 /usr/local/bin/cf 2>/dev/null || sudo mv cf /usr/local/bin/cf
           cf version
-
+# dwwdwd
       - name: Install MultiApps plugin
         run: |
           cf add-plugin-repo CF-Community https://plugins.cloudfoundry.org || true
