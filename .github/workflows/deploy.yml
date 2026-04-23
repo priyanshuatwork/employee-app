@@ -11,95 +11,48 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # -------------------------------
-      # 1. Checkout Code
-      # -------------------------------
       - name: Checkout source
         uses: actions/checkout@v4
 
-      # -------------------------------
-      # 2. Setup Node
-      # -------------------------------
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: npm
 
-      # -------------------------------
-      # 3. Install Dependencies
-      # -------------------------------
       - name: Install project dependencies
-        run: npm ci
+        run: npm install
 
-      # -------------------------------
-      # 4. Install CAP + MTA tools
-      # -------------------------------
       - name: Install CAP build tools
-        run: npm install -g @sap/cds-dk mbt
+        run: |
+          npm install -g @sap/cds-dk mbt
 
-      # -------------------------------
-      # 5. Build CAP Project
-      # -------------------------------
       - name: Build CAP project for production
         run: npx cds build --production
 
-      # -------------------------------
-      # 6. Build MTA Archive
-      # -------------------------------
       - name: Build MTA archive
         run: mbt build
 
-      # -------------------------------
-      # 7. Install CF CLI (FIXED)
-      # -------------------------------
       - name: Install Cloud Foundry CLI
         run: |
-          curl -L "https://packages.cloudfoundry.org/stable?release=linux64-binary&source=github" -o cf.tgz
-          
-          echo "---- Extracting ----"
-          tar -xzf cf.tgz
-          
-          echo "---- Listing files ----"
-          ls -R
-          
-          # Find actual cf binary
-          CF_PATH=$(find . -type f -name cf | head -n 1)
-          
-          if [ -z "$CF_PATH" ]; then
-            echo "CF binary not found!"
-            exit 1
-          fi
-          
-          echo "Found CF binary at: $CF_PATH"
-          
-          chmod +x "$CF_PATH"
-          sudo mv "$CF_PATH" /usr/local/bin/cf
-          
-          which cf
-          cf version
+          wget -q -O cf8.tgz "https://packages.cloudfoundry.org/stable?release=linux64-binary&source=github"
+          tar -xzf cf8.tgz
+          chmod +x ./cf
+          ./cf version
+          sudo mv cf /usr/local/bin/cf
 
-      # -------------------------------
-      # 8. Install MultiApps Plugin
-      # -------------------------------
       - name: Install MultiApps plugin
         run: |
           cf add-plugin-repo CF-Community https://plugins.cloudfoundry.org || true
           cf install-plugin multiapps -f
           cf plugins
 
-      # -------------------------------
-      # 9. Login to Cloud Foundry
-      # -------------------------------
       - name: Login to Cloud Foundry
         run: |
           cf api "${{ secrets.CF_API }}"
           cf auth "${{ secrets.CF_USERNAME }}" "${{ secrets.CF_PASSWORD }}"
           cf target -o "${{ secrets.CF_ORG }}" -s "${{ secrets.CF_SPACE }}"
 
-      # -------------------------------
-      # 10. Deploy MTA
-      # -------------------------------
       - name: Deploy MTA to Cloud Foundry
         run: |
-          cf deploy mta_archives/*.mtar -f
+          cf deploy mta_archives/employee-crud-app_1.0.0.mtar -f
