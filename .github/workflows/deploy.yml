@@ -21,11 +21,10 @@ jobs:
           cache: npm
 
       - name: Install project dependencies
-        run: npm install
+        run: npm ci
 
       - name: Install CAP build tools
-        run: |
-          npm install -g @sap/cds-dk mbt
+        run: npm install -g @sap/cds-dk mbt
 
       - name: Build CAP project for production
         run: npx cds build --production
@@ -33,13 +32,9 @@ jobs:
       - name: Build MTA archive
         run: mbt build
 
-      - name: Install Cloud Foundry CLI
-        run: |
-          wget -q -O cf8.tgz "https://packages.cloudfoundry.org/stable?release=linux64-binary&source=github"
-          tar -xzf cf8.tgz
-          chmod +x ./cf
-          ./cf version
-          sudo mv cf /usr/local/bin/cf
+      # ✅ FIXED CF INSTALL
+      - name: Setup Cloud Foundry CLI
+        uses: cloudfoundry/setup-cf-cli@v1
 
       - name: Install MultiApps plugin
         run: |
@@ -55,4 +50,4 @@ jobs:
 
       - name: Deploy MTA to Cloud Foundry
         run: |
-          cf deploy mta_archives/employee-crud-app_1.0.0.mtar -f
+          cf deploy mta_archives/*.mtar -f
