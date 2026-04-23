@@ -1,0 +1,57 @@
+name: Build and Deploy CAP App to Cloud Foundry
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install project dependencies
+        run: npm install
+
+      - name: Install CAP build tools
+        run: |
+          npm install -g @sap/cds-dk mbt
+
+      - name: Build CAP project for production
+        run: npx cds build --production
+
+      - name: Build MTA archive
+        run: mbt build
+
+      - name: Install Cloud Foundry CLI
+        run: |
+          wget -q -O cf8.tgz "https://packages.cloudfoundry.org/stable?release=linux64-binary&source=github"
+          tar -xzf cf8.tgz
+          sudo mv cf /usr/local/bin/cf
+          cf version
+
+      - name: Install MultiApps plugin
+        run: |
+          cf add-plugin-repo CF-Community https://plugins.cloudfoundry.org || true
+          cf install-plugin multiapps -f
+          cf plugins
+
+      - name: Login to Cloud Foundry
+        run: |
+          cf api "${{ secrets.CF_API }}"
+          cf auth "${{ secrets.CF_USERNAME }}" "${{ secrets.CF_PASSWORD }}"
+          cf target -o "${{ secrets.CF_ORG }}" -s "${{ secrets.CF_SPACE }}"
+
+      - name: Deploy MTA to Cloud Foundry
+        run: |
+          cf deploy mta_archives/employee-crud-app_1.0.0.mtar -f
